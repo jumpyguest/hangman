@@ -1,15 +1,19 @@
 require 'io/console'
+# require_relative 'basicserializeable'
+# require 'json'
 
 class Host
-  attr_reader :num_guesses, :word, :array_guesses
+  # include BasicSerializeable
+
+  attr_accessor :num_guesses, :guess, :word, :array_guesses
 
   MAX_GUESSES = 8
 
-  def initialize
-    @num_guesses = 0
-    @guess = ''
-    @word = ''
-    @array_guesses = Array.new
+  def initialize(num_guesses, guess, word, array_guesses)
+    @num_guesses = num_guesses
+    @guess = guess
+    @word = word
+    @array_guesses = array_guesses
   end
 
   def get_secret_word
@@ -29,11 +33,11 @@ class Host
 
   def prompt_guess
     loop do
-      puts "Enter a letter: "
+      puts "Enter a letter, or [1] - Exit | [2] - Save and Exit: "
       @guess = $stdin.getch.downcase
       if @array_guesses.include?(@guess)
         next
-      elsif @guess >= 'a' && @guess <= 'z'
+      elsif (@guess >= 'a' && @guess <= 'z') || @guess == '1' || @guess == '2'
         break
       end
     end
@@ -51,5 +55,19 @@ class Host
     if hangman_array.join == @word
       return true
     end
+  end
+
+  def to_json(options = {})
+    JSON.dump ({
+      :num_guesses => @num_guesses,
+      :guess =>  @guess,
+      :word => @word,
+      :array_guesses => @array_guesses
+    })
+  end
+
+  def self.from_json(string)
+    data = JSON.load string
+    self.new(data["num_guesses"], data["guess"], data["word"], data["array_guesses"])
   end
 end
