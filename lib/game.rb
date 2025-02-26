@@ -26,8 +26,6 @@ class Game
   end
 
   def self.from_json(string)
-    puts 'game from json'
-
     data = JSON.load string
 
     # Two ways to deserialize Host object:
